@@ -1,0 +1,51 @@
+name: Build LAN Scanner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build macOS DMG
+        run: npm run build-mac
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: LAN-Scanner-macOS
+          path: dist/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows EXE
+        run: npm run build-win
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: LAN-Scanner-Windows
+          path: dist/*.exe

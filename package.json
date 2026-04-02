@@ -1,0 +1,41 @@
+{
+  "name": "lan-scanner",
+  "version": "1.0.0",
+  "description": "LAN IP Scanner - Scan your network for devices",
+  "main": "main.js",
+  "scripts": {
+    "start": "npx electron .",
+    "dev": "npx electron . --dev",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.lanscanner.app",
+    "productName": "LAN Scanner",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "dependencies": {
+    "ping": "^0.4.4",
+    "node-arp": "^1.0.6",
+    "ip": "^1.1.8",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "author": "LAN Scanner",
+  "license": "MIT"
+}

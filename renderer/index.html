@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;" />
+  <title>LAN Scanner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Title Bar -->
+  <div class="titlebar" id="titlebar">
+    <div class="titlebar-logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">LAN<span class="accent">SCANNER</span></span>
+    </div>
+    <div class="titlebar-drag"></div>
+    <div class="titlebar-controls">
+      <button class="ctrl-btn" id="btn-minimize" title="Minimize">─</button>
+      <button class="ctrl-btn" id="btn-maximize" title="Maximize">□</button>
+      <button class="ctrl-btn close" id="btn-close" title="Close">✕</button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-label">NETWORK INTERFACE</div>
+        <select id="network-select" class="select-input">
+          <option value="">Detecting...</option>
+        </select>
+        <div id="local-ip-display" class="info-chip">—</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">SCAN TARGET</div>
+        <label class="radio-label">
+          <input type="radio" name="target" value="auto" checked /> Auto Detect Subnet
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="target" value="custom" /> Custom Range
+        </label>
+        <input type="text" id="custom-range" class="text-input hidden" placeholder="e.g. 192.168.1.0/24" />
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">PORT SCANNING</div>
+        <label class="toggle-label">
+          <input type="checkbox" id="port-scan-toggle" checked />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span>Scan Ports</span>
+        </label>
+        <div id="port-list-container">
+          <div class="section-label" style="margin-top:10px;">PORTS</div>
+          <div class="port-grid" id="port-grid">
+            <!-- Ports rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section scan-actions">
+        <button class="btn-scan" id="btn-scan">
+          <span class="scan-icon">▶</span>
+          <span class="scan-label">START SCAN</span>
+        </button>
+        <button class="btn-cancel hidden" id="btn-cancel">CANCEL</button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">EXPORT</div>
+        <div class="export-row">
+          <button class="btn-export" id="btn-export-json" disabled>JSON</button>
+          <button class="btn-export" id="btn-export-csv" disabled>CSV</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">STATISTICS</div>
+        <div class="stats-grid">
+          <div class="stat-item"><span id="stat-total">0</span><label>Scanned</label></div>
+          <div class="stat-item"><span id="stat-online">0</span><label>Online</label></div>
+          <div class="stat-item"><span id="stat-ports">0</span><label>Open Ports</label></div>
+          <div class="stat-item"><span id="stat-vendors">0</span><label>Vendors</label></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <!-- Header Bar -->
+      <div class="content-header">
+        <div class="header-left">
+          <h1 class="page-title">NETWORK MAP</h1>
+          <div id="scan-status" class="scan-status idle">IDLE</div>
+        </div>
+        <div class="header-right">
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Filter by IP, hostname, vendor..." />
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" id="view-table" title="Table View">☰</button>
+            <button class="view-btn" id="view-cards" title="Card View">⊞</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-wrap" id="progress-wrap" style="display:none">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+          <div class="progress-shimmer"></div>
+        </div>
+        <div class="progress-label" id="progress-label">Scanning...</div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="table-container" id="table-view">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="status">●</th>
+              <th class="sortable" data-col="ip">IP ADDRESS</th>
+              <th class="sortable" data-col="hostname">HOSTNAME</th>
+              <th class="sortable" data-col="mac">MAC ADDRESS</th>
+              <th class="sortable" data-col="vendor">VENDOR</th>
+              <th class="sortable" data-col="pingTime">PING</th>
+              <th>OPEN PORTS</th>
+            </tr>
+          </thead>
+          <tbody id="results-tbody">
+            <tr class="empty-row">
+              <td colspan="7">
+                <div class="empty-state">
+                  <div class="empty-icon">◈</div>
+                  <div class="empty-text">No scan results yet</div>
+                  <div class="empty-sub">Start a scan to discover devices on your network</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Results Cards -->
+      <div class="cards-container hidden" id="cards-view">
+        <div class="cards-grid" id="cards-grid">
+          <!-- Cards rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Log / Terminal -->
+      <div class="terminal-panel" id="terminal-panel">
+        <div class="terminal-header">
+          <span>◈ SCAN LOG</span>
+          <button class="terminal-clear" id="terminal-clear">CLEAR</button>
+        </div>
+        <div class="terminal-output" id="terminal-output">
+          <div class="log-line system">LAN Scanner v1.0.0 — Ready</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
