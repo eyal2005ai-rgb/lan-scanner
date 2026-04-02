@@ -47,7 +47,7 @@ jobs:
       - name: Build Windows EXE
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win --publish never
+        run: run: npx electron-builder --mac --universal --publish never
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
